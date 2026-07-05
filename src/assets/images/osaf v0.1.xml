@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?><unload unload_date="2019-01-01 03:32:02">
+<sys_remote_update_set action="INSERT_OR_UPDATE">
+<application display_value="Global">global</application>
+<application_name>Global</application_name>
+<application_scope>global</application_scope>
+<application_version/>
+<collisions/>
+<commit_date/>
+<deleted/>
+<description/>
+<inserted/>
+<name>osaf v0.1</name>
+<origin_sys_id/>
+<parent display_value=""/>
+<release_date/>
+<remote_base_update_set display_value=""/>
+<remote_parent_id/>
+<remote_sys_id>bb45e860db3263008096a455ca9619ef</remote_sys_id>
+<state>loaded</state>
+<summary/>
+<sys_class_name>sys_remote_update_set</sys_class_name>
+<sys_created_by>jacebenson</sys_created_by>
+<sys_created_on>2019-01-01 03:32:01</sys_created_on>
+<sys_id>1f06ac60db3263008096a455ca961920</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_updated_by>jacebenson</sys_updated_by>
+<sys_updated_on>2019-01-01 03:32:01</sys_updated_on>
+<update_set display_value=""/>
+<update_source display_value=""/>
+<updated/>
+</sys_remote_update_set>
+<sys_update_xml action="INSERT_OR_UPDATE">
+<action>INSERT_OR_UPDATE</action>
+<application display_value="Global">global</application>
+<category>customer</category>
+<comments/>
+<name>sys_ui_formatter_40a5e0a0db3263008096a455ca96198f</name>
+<payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_formatter"><sys_ui_formatter action="INSERT_OR_UPDATE"><active>true</active><angular_module/><formatter>osaf.xml</formatter><name>Open Source Activity Formatter</name><sys_class_name>sys_ui_formatter</sys_class_name><sys_created_by>jacebenson</sys_created_by><sys_created_on>2019-01-01 03:30:31</sys_created_on><sys_id>40a5e0a0db3263008096a455ca96198f</sys_id><sys_mod_count>0</sys_mod_count><sys_name>Open Source Activity Formatter</sys_name><sys_package display_value="Global" source="global">global</sys_package><sys_policy/><sys_scope display_value="Global">global</sys_scope><sys_update_name>sys_ui_formatter_40a5e0a0db3263008096a455ca96198f</sys_update_name><sys_updated_by>jacebenson</sys_updated_by><sys_updated_on>2019-01-01 03:30:31</sys_updated_on><table>task</table><type>formatter</type></sys_ui_formatter></record_update>]]></payload>
+<payload_hash>-1966537365</payload_hash>
+<remote_update_set display_value="osaf v0.1">1f06ac60db3263008096a455ca961920</remote_update_set>
+<replace_on_upgrade>false</replace_on_upgrade>
+<sys_created_by>jacebenson</sys_created_by>
+<sys_created_on>2019-01-01 03:32:01</sys_created_on>
+<sys_id>5306ac60db3263008096a455ca961921</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_recorded_at>168077678e10000001</sys_recorded_at>
+<sys_updated_by>jacebenson</sys_updated_by>
+<sys_updated_on>2019-01-01 03:32:01</sys_updated_on>
+<table>task</table>
+<target_name>Open Source Activity Formatter</target_name>
+<type>UI Formatter</type>
+<update_domain>global</update_domain>
+<update_guid>05b52c60f9326300b1b643611126130a</update_guid>
+<update_guid_history>05b52c60f9326300b1b643611126130a:-1966537365</update_guid_history>
+<update_set display_value=""/>
+<view/>
+</sys_update_xml>
+<sys_update_xml action="INSERT_OR_UPDATE">
+<action>INSERT_OR_UPDATE</action>
+<application display_value="Global">global</application>
+<category>customer</category>
+<comments/>
+<name>sys_ui_macro_aa75ac60db3263008096a455ca96193d</name>
+<payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;record_update table="sys_ui_macro"&gt;&lt;sys_ui_macro action="INSERT_OR_UPDATE"&gt;&lt;active&gt;true&lt;/active&gt;&lt;category&gt;general&lt;/category&gt;&lt;description/&gt;&lt;media_type/&gt;&lt;name&gt;osaf&lt;/name&gt;&lt;scoped_name/&gt;&lt;sys_class_name&gt;sys_ui_macro&lt;/sys_class_name&gt;&lt;sys_created_by&gt;jacebenson&lt;/sys_created_by&gt;&lt;sys_created_on&gt;2019-01-01 03:29:42&lt;/sys_created_on&gt;&lt;sys_id&gt;aa75ac60db3263008096a455ca96193d&lt;/sys_id&gt;&lt;sys_mod_count&gt;0&lt;/sys_mod_count&gt;&lt;sys_name&gt;osaf&lt;/sys_name&gt;&lt;sys_package display_value="Global" source="global"&gt;global&lt;/sys_package&gt;&lt;sys_policy/&gt;&lt;sys_scope display_value="Global"&gt;global&lt;/sys_scope&gt;&lt;sys_update_name&gt;sys_ui_macro_aa75ac60db3263008096a455ca96193d&lt;/sys_update_name&gt;&lt;sys_updated_by&gt;jacebenson&lt;/sys_updated_by&gt;&lt;sys_updated_on&gt;2019-01-01 03:29:42&lt;/sys_updated_on&gt;&lt;xml&gt;&lt;![CDATA[&lt;?xml version="1.0" encoding="utf-8" ?&gt;
+&lt;j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null"&gt;
+	&lt;g:evaluate&gt;
+try {
+    var documentId = RP.getParameterValue("sys_id");
+    var referringURL = RP.getReferringURL();
+    var table = referringURL.split(".")[0];
+	var current = new GlideRecord(table);
+	current.get(documentId);
+    var entries = [];
+    var x = 0;
+	var journal = new GlideRecord('sys_journal_field');
+	journal.addQuery('element_id', documentId);
+	journal.orderByDesc('sys_created_on');
+	journal.query();
+	while(journal.next()){
+        entries.push({
+            value: journal.getValue("value"),
+            label: current[journal.getValue('element')].getLabel(),
+            field: journal.getValue("element"),
+            user: (function(){
+		      var u = new GlideRecord('sys_user');
+		      if(u.get('user_name',journal.getValue('sys_created_by'))){
+		        return u.getDisplayValue();
+		      } else {
+		        return journal.getValue('sys_created_by');
+		      }
+		    })(),
+            time: journal.sys_created_on.getDisplayValue(),
+            classNames: (function() {
+                if (journal.getValue("element") === "work_notes") {
+                    return "alert alert-warning";
+                } else {
+                    return "alert alert-info";
+                }
+            })()
+        });
+    }
+} catch (e) {
+    gs.addErrorMessage(JSON.stringify(e));
+}
+	&lt;/g:evaluate&gt;
+	&lt;!--
+    &lt;p&gt;Documentid ${documentId}&lt;/p&gt;
+	&lt;p&gt;Referring URL ${referringURL}&lt;/p&gt;
+	&lt;p&gt;Entries length ${entries.length}&lt;/p&gt;
+	&lt;p&gt;Entries ${JSON.stringify(entries)}&lt;/p&gt;
+	--&gt;
+    &lt;div class="container"&gt;
+		&lt;div class="row"&gt;
+			&lt;div class="label_left label_spacing"&gt;
+				&lt;label class="col-xs-12 col-md-1_5 col-lg-2 control-label"&gt;
+					&lt;span&gt;&lt;/span&gt;
+					&lt;span class="label-text"&gt;Activites&lt;/span&gt;
+				&lt;/label&gt;
+			&lt;/div&gt;
+			&lt;div class="col-md-8"&gt;
+				&lt;j:while test="${parseInt(x,10)!=entries.length}"&gt;
+				&lt;div class="row"&gt;
+					&lt;div class="${entries[x].classNames} col-md-12" role="alert"&gt;
+						&lt;div&gt;
+							&lt;span&gt;${entries[x].label}:$[SP]&lt;/span&gt;
+							&lt;span&gt;${entries[x].value}&lt;/span&gt;
+							&lt;span class="hide"&gt;${JSON.stringify(entries[x])}&lt;/span&gt;
+						&lt;/div&gt;
+						&lt;footer class="blockquote-footer"&gt;${entries[x].time} (&lt;cite title="Source Title"&gt;${entries[x].user}&lt;/cite&gt;)&lt;/footer&gt;
+					&lt;/div&gt;
+				&lt;g:evaluate&gt;x = x + 1;&lt;/g:evaluate&gt;
+				&lt;/div&gt;
+		&lt;/j:while&gt;
+			&lt;/div&gt;
+		&lt;/div&gt;
+	&lt;/div&gt;
+&lt;/j:jelly&gt;]]&gt;&lt;/xml&gt;&lt;/sys_ui_macro&gt;&lt;/record_update&gt;</payload>
+<payload_hash>1118439477</payload_hash>
+<remote_update_set display_value="osaf v0.1">1f06ac60db3263008096a455ca961920</remote_update_set>
+<replace_on_upgrade>false</replace_on_upgrade>
+<sys_created_by>jacebenson</sys_created_by>
+<sys_created_on>2019-01-01 03:32:01</sys_created_on>
+<sys_id>5b06ac60db3263008096a455ca961921</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_recorded_at>1680775bb240000001</sys_recorded_at>
+<sys_updated_by>jacebenson</sys_updated_by>
+<sys_updated_on>2019-01-01 03:32:01</sys_updated_on>
+<table/>
+<target_name>osaf</target_name>
+<type>Macro</type>
+<update_domain>global</update_domain>
+<update_guid>59852c60d83263006847e5b8d8de6306</update_guid>
+<update_guid_history>59852c60d83263006847e5b8d8de6306:1118439477</update_guid_history>
+<update_set display_value=""/>
+<view/>
+</sys_update_xml>
+</unload>
