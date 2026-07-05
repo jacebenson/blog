@@ -4,8 +4,6 @@ description: 'A simple Node.js script to grab the build tag from any ServiceNow 
 date: '2019-04-15'
 tags:
   - servicenow
-  - nodejs
-  - script
 redirectFrom:
   - /servicenow-instance-build-tag/
   - /p/2019-04-15-instance-info/

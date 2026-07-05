@@ -4,7 +4,6 @@ description: 'Apps, tools, and update sets I collected from Share and GitHub ove
 date: '2022-02-15'
 tags:
   - servicenow
-  - awesome-list
 redirectFrom:
   - /servicenow-resource-hub/
   - /p/2022-02-15-servicenow-hub/
