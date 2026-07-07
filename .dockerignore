@@ -1,0 +1,8 @@
+node_modules
+.git
+.env
+.env-sample
+dist
+src/_includes/css
+src/_includes/scripts
+src/assets/og-images
