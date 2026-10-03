@@ -8,7 +8,6 @@ tags:
   - ai
   - thoughts
 date: '2026-10-03'
-draft: true
 ---
 
 I started a note called *comparisons of AI patterns*. It's not really a
