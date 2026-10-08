@@ -122,7 +122,7 @@ fi
 
 instance_url="https://${instance_host}"
 
-for command_name in curl unzip docker python3; do
+for command_name in curl unzip docker; do
   if ! command -v "$command_name" >/dev/null 2>&1; then
     echo "ERROR: Missing prerequisite: $command_name" >&2
     exit 1
@@ -155,18 +155,9 @@ if ! response=$(curl -fsS --connect-timeout 10 --max-time 60 \
   exit 1
 fi
 
-if ! release_name=$(printf '%s' "$response" | python3 -c '
-import json
-import sys
-
-try:
-    value = json.load(sys.stdin)["result"][0]["value"]
-    if not isinstance(value, str) or not value:
-        raise ValueError
-    print(value)
-except (KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError):
-    sys.exit("ERROR: No MID version found in the API response.")
-'); then
+release_name=$(printf '%s' "$response" | cut -d'"' -f6)
+if [[ -z "$release_name" ]]; then
+  echo "ERROR: No MID version found in the API response." >&2
   exit 1
 fi
 
