@@ -1,188 +1,259 @@
 ---
-title: "Setting Up a ServiceNow MID Server in 3 Minutes (No Docker Hub Required)"
+title: "Building a ServiceNow MID Server Container From the Official Recipe"
 description: >-
-  A quick script to spin up a ServiceNow MID server using the official container recipe directly from your instance, without relying on third-party Docker images.
+  Build a ServiceNow MID Server container from the official version-matched recipe instead of pulling a third-party MID image. The script checks network access, reads mid.version, builds the image, and starts it with Docker Compose.
 tags:
   - servicenow
 date: '2026-05-19'
+redirectFrom:
+  - /blog/setting-up-a-servicenow-mid-server-in-3-minutes-no-docker-hub-required/
 ---
-# Spinning Up a ServiceNow MID Server Without Docker Hub
+# Building a ServiceNow MID Server container from the official recipe
 
-The `moers/mid-server` image on Docker Hub is convenient, but what if you want to understand what's actually happening under the hood? Or what if you need to run a MID server on a machine without internet access to Docker Hub?
+You can build a MID Server container from the recipe published by ServiceNow instead of pulling a third-party MID image. The instance's `mid.version` property tells you which recipe to download.
 
-Turns out, ServiceNow publishes version-specific MID server container recipes directly from your instance. You just need to ask it what version it's running.
+This works for both `service-now.com` and `servicenowservices.com` instances. The Docker host must be able to reach the instance and ServiceNow's download host. The downloaded recipe may also use a base image that requires access to a container registry, so inspect its `Dockerfile` before building.
 
-## The Secret: `mid.version`
+## Before you start
 
-Every ServiceNow instance stores its own MID server version as a system property:
+Install Docker with Compose, `curl`, `unzip`, and Python 3 on the Linux host. You also need a ServiceNow account that can read `mid.version` and authenticate the MID Server.
 
+The Docker host must reach these endpoints over HTTPS:
+
+- Your ServiceNow instance
+- `install.service-now.com`
+- Any container registry required by the downloaded recipe's `Dockerfile`
+
+The database or other target system must also be reachable from the MID container on its actual listener port.
+
+### Test the network from the Docker host
+
+If you use Ubuntu in WSL2 behind a corporate VPN, do not assume a successful Windows browser or PowerShell test means Ubuntu can connect. Test from Ubuntu first:
+
+```bash
+getent hosts example.service-now.com
+curl -v --connect-timeout 10 https://example.service-now.com/
+getent hosts install.service-now.com
+curl -v --connect-timeout 10 https://install.service-now.com/
 ```
-GET /api/now/table/sys_properties?sysparm_query=name=mid.version
+
+An HTTP redirect or login page proves the HTTPS connection works. A DNS failure or TCP timeout does not. Replace the example hostname with your own.
+
+If Windows works on the VPN but Ubuntu times out, fix the WSL and VPN routing or policy with your network team, or use an approved host that has access. Reinstalling Docker, disabling the firewall, or changing this script will not fix a blocked network path.
+
+## Set up the instance and credentials
+
+Create `.env` in the same directory as `mid.sh`. In that directory, run `umask 077`, then open the file in an editor:
+
+```bash
+umask 077
+nano .env
 ```
 
-This returns something like:
+Put these assignments in the file. Replace the placeholders with your instance and MID account:
 
-```
-mid-linux-container-recipe.2024-12-19_1707272914
-```
-
-Or on newer instances:
-
-```
-australia-02-11-2026__patch2-04-17-2026_04-29-2026_2044
+```bash
+servicenow_instance="example.service-now.com"
+mid_username="your-mid-user"
+mid_password="your-password"
 ```
 
-Either way, the last `MM-DD-YYYY` pattern in that string is the build date, which tells you exactly where to download the matching container recipe from `install.service-now.com`.
+For a `servicenowservices.com` instance, use `example.servicenowservices.com`. A short name such as `example` also works and expands to `example.service-now.com`.
 
-## The Script
+Because `mid.sh` sources `.env`, use valid Bash assignments with no spaces around `=`. Quote passwords that contain shell-special characters. Do not run `.env` by itself.
 
-Here's a standalone shell script that does the whole thing — query your instance, download the recipe, build the Docker image, and start the MID server. This is adapted from [John Dahl's servicenow_mid_server_docker_setup_script](https://github.com/johndahl-now/servicenow_mid_server_docker_setup_script) with a few tweaks for broader version format support:
+Then run:
+
+```bash
+chmod 600 .env
+chmod +x mid.sh
+./mid.sh
+```
+
+Add `.env` to `.gitignore`. Do not commit it or post its contents in logs or tickets. Compose substitutes the credentials at startup, so they are not written as literal values in the generated YAML. They are still available to Docker and users with Docker access. Use an approved secret-management approach for production deployments.
+
+Rerun `mid.sh` rather than running `docker compose up` separately. The script exports the values Compose needs for that invocation.
+
+## The script
+
+Save this as `mid.sh` alongside `.env`. Run it from an account allowed to use Docker.
 
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Configuration — set these here or in a separate secrets.sh
-mid_display_name="${mid_display_name:-aiinabox-mid}"
+cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
+
+if [[ ! -f ./.env ]]; then
+  echo "ERROR: Create .env next to mid.sh with servicenow_instance, mid_username, and mid_password." >&2
+  exit 1
+fi
+
+# shellcheck disable=SC1091
+source ./.env
+
+mid_display_name="${mid_display_name:-my-mid}"
 mid_server_name="${mid_server_name:-docker_mid_server}"
 servicenow_instance="${servicenow_instance:-}"
 mid_username="${mid_username:-}"
 mid_password="${mid_password:-}"
 
-# Load secrets from external file (if present)
-if [[ -f ./secrets.sh ]]; then
-  source ./secrets.sh
-fi
-
-# Validate required vars
-if [[ -z "$servicenow_instance" ]]; then
-  echo "ERROR: servicenow_instance is not set."
-  exit 1
-fi
-if [[ -z "$mid_username" || -z "$mid_password" ]]; then
-  echo "ERROR: mid_username and mid_password must be set."
+if [[ -z "$servicenow_instance" || -z "$mid_username" || -z "$mid_password" ]]; then
+  echo "ERROR: Set servicenow_instance, mid_username, and mid_password in .env." >&2
   exit 1
 fi
 
-# Check prerequisites
-for cmd in curl unzip docker; do
-  if ! command -v "$cmd" &>/dev/null; then
-    echo "ERROR: '$cmd' not found."
+case "$servicenow_instance" in
+  https://*) instance_host="${servicenow_instance#https://}" ;;
+  http://*|*://*)
+    echo "ERROR: Only HTTPS instance URLs are supported." >&2
+    exit 1
+    ;;
+  *) instance_host="$servicenow_instance" ;;
+esac
+
+instance_host="${instance_host%/}"
+if [[ "$instance_host" != *.* ]]; then
+  instance_host="${instance_host}.service-now.com"
+fi
+
+if [[ ! "$instance_host" =~ ^[[:alnum:]-]+(\.[[:alnum:]-]+)+$ || "$instance_host" == *..* ]]; then
+  echo "ERROR: Provide a short instance name or HTTPS hostname without a path or port." >&2
+  exit 1
+fi
+
+instance_url="https://${instance_host}"
+
+for command_name in curl unzip docker python3; do
+  if ! command -v "$command_name" >/dev/null 2>&1; then
+    echo "ERROR: Missing prerequisite: $command_name" >&2
     exit 1
   fi
 done
-if ! docker info &>/dev/null; then
-  echo "ERROR: Cannot talk to Docker. Is it running and are you in the docker group?"
+
+if ! docker info >/dev/null 2>&1; then
+  echo "ERROR: Docker is not available to this user." >&2
   exit 1
 fi
 
-# Stop existing container
-if [[ -f docker-compose.yaml ]]; then
-  echo "Shutting down existing container..."
-  docker compose down 2>/dev/null || true
-fi
-
-# Get MID version from instance
-echo "Querying $servicenow_instance for MID version..."
-url="https://${servicenow_instance}.service-now.com/api/now/table/sys_properties?sysparm_query=name=mid.version&sysparm_fields=value&sysparm_limit=1"
-response=$(curl -s "$url" --request GET \
-  --header "Accept:application/json" \
-  --user "${mid_username}:${mid_password}")
-
-if echo "$response" | grep -q '"error"'; then
-  echo "ERROR: API call failed. Check your credentials."
-  echo "$response"
+# Test the network before touching an existing MID container.
+if ! curl -sS --connect-timeout 10 --max-time 30 -o /dev/null "${instance_url}/"; then
+  echo "ERROR: Cannot reach ${instance_url} from this host. Check DNS, VPN, and TCP 443." >&2
   exit 1
 fi
 
-# Extract version (no jq needed — use cut)
-releasename=$(echo "$response" | cut -d'"' -f6)
-echo "MID Server release: $releasename"
+if ! curl -sS --connect-timeout 10 --max-time 30 -o /dev/null "https://install.service-now.com/"; then
+  echo "ERROR: Cannot reach install.service-now.com from this host." >&2
+  exit 1
+fi
 
-# Extract build date — finds the last MM-DD-YYYY in the string
-# Handles both:
-#   mid-linux-container-recipe.2024-12-19_1707272914
-#   australia-02-11-2026__patch2-04-17-2026_04-29-2026_2044
-build_date=$(echo "$releasename" | grep -oE '[0-9]{2}-[0-9]{2}-[0-9]{4}' | tail -1)
-rel_month=$(echo "$build_date" | cut -d'-' -f1)
-rel_day=$(echo "$build_date" | cut -d'-' -f2)
-rel_year=$(echo "$build_date" | cut -d'-' -f3)
+echo "Querying ${instance_host} for the MID version..."
+api_url="${instance_url}/api/now/table/sys_properties?sysparm_query=name=mid.version&sysparm_fields=value&sysparm_limit=1"
 
-# Download the recipe
-filename="mid-linux-container-recipe.${releasename}.linux.x86-64.zip"
+if ! response=$(curl -fsS --connect-timeout 10 --max-time 60 \
+  --header 'Accept: application/json' \
+  --user "${mid_username}:${mid_password}" "$api_url"); then
+  echo "ERROR: MID version lookup failed. Check API access and credentials." >&2
+  exit 1
+fi
+
+if ! release_name=$(printf '%s' "$response" | python3 -c '
+import json
+import sys
+
+try:
+    value = json.load(sys.stdin)["result"][0]["value"]
+    if not isinstance(value, str) or not value:
+        raise ValueError
+    print(value)
+except (KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError):
+    sys.exit("ERROR: No MID version found in the API response.")
+'); then
+  exit 1
+fi
+
+if [[ ! "$release_name" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+  echo "ERROR: Unexpected MID release name." >&2
+  exit 1
+fi
+
+# The last date in the release name identifies the recipe directory.
+build_date=$(printf '%s\n' "$release_name" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{2}-[0-9]{2}-[0-9]{4}' | tail -n 1 || true)
+if [[ -z "$build_date" ]]; then
+  echo "ERROR: MID release name has no build date." >&2
+  exit 1
+fi
+
+IFS='-' read -r first second third <<< "$build_date"
+if [[ "$first" =~ ^[0-9]{4}$ ]]; then
+  rel_year="$first"
+  rel_month="$second"
+  rel_day="$third"
+else
+  rel_month="$first"
+  rel_day="$second"
+  rel_year="$third"
+fi
+
+filename="mid-linux-container-recipe.${release_name}.linux.x86-64.zip"
 recipe_url="https://install.service-now.com/glide/distribution/builds/package/app-signed/mid-linux-container-recipe/${rel_year}/${rel_month}/${rel_day}/${filename}"
+work_dir=$(mktemp -d)
+trap 'rm -rf -- "$work_dir"' EXIT
 
-echo "Downloading $filename ..."
-curl -fSL "$recipe_url" -o "$filename"
+echo "Downloading ${filename}..."
+curl -fSL --connect-timeout 10 --max-time 300 "$recipe_url" -o "${work_dir}/${filename}"
+unzip -q "${work_dir}/${filename}" -d "${work_dir}/recipe"
 
-mkdir -p ./recipe ./export
-chmod 777 ./export
-unzip -o "$filename" -d ./recipe
+image="${mid_server_name}:${release_name}"
+docker build --tag "$image" "${work_dir}/recipe"
 
-mid_server_version=$(echo "$filename" | cut -d'.' -f2)
+mkdir -p ./export
 
-# Build the Docker image
-echo "Building image ${mid_server_name}:${mid_server_version} ..."
-docker build --tag "${mid_server_name}:${mid_server_version}" ./recipe
+# Docker Compose substitutes these values at startup. Do not write passwords into the YAML.
+export MID_INSTANCE_URL="${instance_url}/"
+export MID_INSTANCE_USERNAME="$mid_username"
+export MID_INSTANCE_PASSWORD="$mid_password"
+export MID_SERVER_NAME="$mid_display_name"
+umask 077
 
-# Clean up
-rm -r ./recipe
-rm -f "$filename"
-
-# Create docker-compose.yaml and start
 cat > docker-compose.yaml <<EOF
 services:
   ${mid_server_name}:
     container_name: ${mid_server_name}
-    image: ${mid_server_name}:${mid_server_version}
+    image: ${image}
     restart: unless-stopped
     volumes:
       - ./export:/opt/snc_mid_server/agent/export
     environment:
-      MID_INSTANCE_URL: "https://${servicenow_instance}.service-now.com/"
-      MID_INSTANCE_USERNAME: "${mid_username}"
-      MID_INSTANCE_PASSWORD: "${mid_password}"
-      MID_SERVER_NAME: "${mid_display_name}"
+      MID_INSTANCE_URL: \${MID_INSTANCE_URL}
+      MID_INSTANCE_USERNAME: \${MID_INSTANCE_USERNAME}
+      MID_INSTANCE_PASSWORD: \${MID_INSTANCE_PASSWORD}
+      MID_SERVER_NAME: \${MID_SERVER_NAME}
 EOF
 
-echo "Starting MID server..."
+chmod 600 docker-compose.yaml
 docker compose up -d
 
-echo "Done! Validate at: https://$servicenow_instance.service-now.com/mid_server_list.do"
+echo "Check the MID Server at ${instance_url}/ecc_agent_list.do"
 ```
 
-## How It Works
+The script builds before asking Compose to replace the existing container. A failed preflight, version lookup, download, or build leaves the current container alone. Container recreation can still cause a short interruption. For critical MID workloads, plan redundancy instead of treating a local rebuild as zero downtime.
 
-1. **Query your instance** for the `mid.version` property
-2. **Extract the build date** — the last `MM-DD-YYYY` pattern in the version string, works for any format
-3. **Download the official recipe** from `install.service-now.com` for that exact build
-4. **Build a Docker image** from the recipe
-5. **Start it with Docker Compose**, mounting the export directory for file attachments
+## Check the MID's actual network path
 
-The beauty of this approach: you're getting the **exact** MID server build that matches your instance, directly from ServiceNow's distribution servers. No third-party Docker images, no version guesswork.
+The host test checks only the Linux host. After startup:
 
-## Why This Matters
+1. Confirm the MID appears Up in ServiceNow.
+2. Check the logs with `docker compose logs --tail=100`.
+3. Test name resolution and TCP access from the running container using tools available in the image.
+4. Test the database hostname and listener port from both the host and the MID container.
 
-- **Air-gapped environments** — download the recipe once, bake it into your base image
-- **Auditability** — you control exactly what gets built and run
-- **No Docker Hub dependency** — everything comes from your instance or `install.service-now.com`
-- **Version-locked** — your MID server always matches your instance version
+Do not assume utilities such as `nc` are installed in the image. Use the diagnostic tools the image provides, or temporarily run a separate diagnostic container on the same network.
 
-## Usage
+On WSL2, Windows, Ubuntu, and Docker can have different network paths, especially while a VPN is connected. If Windows reaches the instance but Ubuntu cannot, stop and resolve the VPN, WSL routing, or network policy issue. No MID script can grant access the VPN does not provide.
 
-Create a `secrets.sh` file alongside the script:
+## What this approach does and does not solve
 
-```bash
-servicenow_instance="dev383416"
-mid_username="mid_user"
-mid_password="your_password"
-```
+This approach removes the dependency on pulling a third-party MID image from Docker Hub. It does not make the deployment air-gapped. The Docker host still needs access to the ServiceNow instance, `install.service-now.com`, and any registry named by the downloaded recipe's base image.
 
-Then run:
-
-```bash
-chmod +x midserver.sh
-./midserver.sh
-```
-
-The script will query your instance, download the matching recipe, build the Docker image, and start the MID server. Validate it in ServiceNow under **MID Servers** and you're done.
+It also does not replace a secret manager. The credentials are passed to Docker at startup and remain visible to users with sufficient Docker access. That is acceptable for a local test, but production deployments need the secret handling required by your environment.
