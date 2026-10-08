@@ -1,12 +1,10 @@
 ---
-title: "Building a ServiceNow MID Server Container From the Official Recipe"
+title: "Setting Up a ServiceNow MID Server in 3 Minutes (No Docker Hub Required)"
 description: >-
   Build a ServiceNow MID Server container from the official version-matched recipe instead of pulling a third-party MID image. The script checks network access, reads mid.version, builds the image, and starts it with Docker Compose.
 tags:
   - servicenow
 date: '2026-05-19'
-redirectFrom:
-  - /blog/setting-up-a-servicenow-mid-server-in-3-minutes-no-docker-hub-required/
 ---
 # Building a ServiceNow MID Server container from the official recipe
 
