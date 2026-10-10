@@ -20,42 +20,65 @@
 </style>
 <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
 <script>
-  function initMermaid() {
-    if (typeof mermaid === 'undefined') return;
-    
-    // Initialize mermaid with config FIRST
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: 'default',
-      securityLevel: 'loose',
-      flowchart: {
-        useMaxWidth: false,
-        htmlLabels: true,
-        wrappingWidth: 300
-      }
+  (function () {
+    var blocks = [];
+
+    function preferredTheme() {
+      var attr = document.documentElement.getAttribute('data-theme');
+      if (attr === 'dark') return 'dark';
+      if (attr === 'light') return 'default';
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
+    }
+
+    function render() {
+      if (typeof mermaid === 'undefined' || !blocks.length) return;
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: preferredTheme(),
+        securityLevel: 'loose',
+        flowchart: {
+          useMaxWidth: false,
+          htmlLabels: true,
+          wrappingWidth: 300
+        }
+      });
+
+      // Restore the original diagram source, then re-render with the active theme.
+      blocks.forEach(function (el) {
+        el.removeAttribute('data-processed');
+        el.textContent = el.getAttribute('data-mermaid-source');
+      });
+
+      mermaid.run({ nodes: blocks, suppressErrors: true });
+    }
+
+    function initMermaid() {
+      if (typeof mermaid === 'undefined') return;
+
+      document.querySelectorAll('div.mermaid, pre.mermaid').forEach(function (el) {
+        if (!el.hasAttribute('data-mermaid-source')) {
+          el.setAttribute('data-mermaid-source', el.textContent);
+        }
+        blocks.push(el);
+      });
+
+      render();
+    }
+
+    // Run when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initMermaid);
+    } else {
+      initMermaid();
+    }
+
+    // Re-render when the site theme changes (toggle button or system setting).
+    new MutationObserver(render).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
     });
 
-    // Decode HTML entities in mermaid blocks before rendering
-    document.querySelectorAll('div.mermaid, pre.mermaid').forEach(function(el) {
-      var html = el.innerHTML;
-      // Decode common HTML entities
-      var decoded = html
-        .replace(/&amp;/g, '&')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, "'");
-      el.innerHTML = decoded;
-    });
-    
-    // Now manually run mermaid
-    mermaid.run();
-  }
-
-  // Run when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initMermaid);
-  } else {
-    initMermaid();
-  }
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
+  })();
 </script>
