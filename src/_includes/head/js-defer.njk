@@ -1,5 +1,9 @@
 <script src="{% getBundleFileUrl "js", "defer" %}" type="module"></script>
 
+{%- js "defer" %}
+{% include "scripts/webmcp.js" %}
+{% endjs %}
+
 <!-- Mermaid.js for diagram rendering -->
 <style>
   .mermaid {
