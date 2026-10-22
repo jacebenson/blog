@@ -23,7 +23,7 @@ I have Pro and Elite machines. I wanted each machine to be useful, but I didn't 
 
 That was the first important design choice.
 
-In [hermes-agents](https://github.com/jacebenson/hermes-agents), I keep agent identities, skills, tests, and a roster. In [homelab](https://github.com/jacebenson/homelab), I keep infrastructure concerns: host placement, provisioning, services, and deployment.
+In my private Hermes Agents repository, I keep agent identities, skills, tests, and a roster. In [homelab](https://github.com/jacebenson/homelab), I keep infrastructure concerns: host placement, provisioning, services, and deployment.
 
 A bot's identity shouldn't need to know which physical computer runs it. And replacing a machine shouldn't mean rewriting the bot.
 
