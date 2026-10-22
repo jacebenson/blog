@@ -7,11 +7,11 @@ tags:
   - ai
 ---
 
-A couple of weeks ago I wrote [A History of AI, From My Point of View](/posts/2026/2026-10-03-a-history-of-ai-from-my-point-of-view/) and [AI Agent Patterns, as Mermaid Diagrams](/posts/2026/2026-10-03-ai-agent-patterns-as-mermaid-diagrams/). Those posts walk through my path from GPT-3 and copy-paste prompts to tools, CLIs, opencode, and eventually Hermes. The last diagram was a Michelin-style kitchen: a chief of staff, head chefs, specialist bots, and verifiers. At the time, it was the architecture I was building toward.
+In [my AI history](/posts/2026/2026-10-03-a-history-of-ai-from-my-point-of-view/) and [agent-pattern diagrams](/posts/2026/2026-10-03-ai-agent-patterns-as-mermaid-diagrams/), I ended with a plan: a kitchen of Hermes agents, led by a chief of staff.
 
-This is what happened when I tried to actually build it.
+I had six homelab PCs—three HP EliteDesks and three HP ProDesks—so I tried building it. Now there's a fleet of bots, a task board, deployment automation, and a desktop view called the Village.
 
-I wanted to run useful Hermes agents across the computers I already own, not just draw a diagram. That turned into a fleet of bots, a management hierarchy, a deployment pipeline, a task board, and a desktop view I call the Village. It's still a work in progress. Here's the path I took, including enough of the architecture that another Hermes user could hand this to their own bot and start building something similar.
+Here's how I got there, and enough to help you build your own.
 
 ## 1. One bot is easy. Keeping several consistent is not.
 
