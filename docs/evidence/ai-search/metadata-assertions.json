@@ -1,0 +1,25 @@
+{
+  "results": [
+    {
+      "route": "/",
+      "canonical": "https://jace.pro/",
+      "jsonBlocks": 1
+    },
+    {
+      "route": "/blog/a-history-of-ai-from-my-point-of-view/",
+      "canonical": "https://jace.pro/blog/a-history-of-ai-from-my-point-of-view/",
+      "jsonBlocks": 2,
+      "articleId": "https://jace.pro/blog/a-history-of-ai-from-my-point-of-view/",
+      "description": "I've cycled through about a dozen different ways of using AI over the last few years. This is that whole path, from copy-pasting prompts into a chat window to running agents across multiple machines."
+    },
+    {
+      "route": "/blog/ai-agent-patterns-as-mermaid-diagrams/",
+      "canonical": "https://jace.pro/blog/ai-agent-patterns-as-mermaid-diagrams/",
+      "jsonBlocks": 2,
+      "articleId": "https://jace.pro/blog/ai-agent-patterns-as-mermaid-diagrams/",
+      "description": "A companion to my AI history: every agent pattern I have used, from one-shot prompts to a full orchestration kitchen, drawn as a Mermaid diagram."
+    }
+  ],
+  "syntheticScriptInjection": "passed",
+  "robotsAndDiscovery": "passed"
+}

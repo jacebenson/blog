@@ -1,12 +1,4 @@
-{% set metaDescription %}
-  {%- if discover.description -%}
-    {{- discover.description -}}
-  {%- elif description -%}
-    {{- description -}}
-  {%- else -%}
-    {{- meta.siteDescription -}}
-  {%- endif -%}
-{% endset %}
+{% set metaDescription = discover.description or description or meta.siteDescription %}
 
 <meta name="description" content="{{ metaDescription }}" />
 <meta name="theme-color" content="{{ meta.themeDark }}" media="(prefers-color-scheme: dark)" />

@@ -1,27 +1,31 @@
+{% set canonical = meta.url + page.url %}
+{% set image = meta.url + meta.opengraph_default %}
+{% if discover.image %}{% set image = meta.url + '/assets/images/' + discover.image %}{% endif %}
 <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     "mainEntityOfPage": {
-      "@type": "WebPage"
+      "@type": "WebPage",
+      "@id": {{ canonical | jsonLd | safe }}
     },
     "isPartOf": {
-      "@id": "{{ meta.url }}#website"
+      "@id": {{ (meta.url + '#website') | jsonLd | safe }}
     },
-    "@id": "{{ url }}",
-    "headline": "{{ title or meta.siteName }}",
-    "description": "{{ discover.description or description or meta.siteDescription }}",
-    "image": "{{ meta.url }}{% if discover.image %}/assets/images/{{ discover.image }}{% else %}{{ meta.opengraph_default }}{% endif %}",
-    "inLanguage": "{{ meta.locale }}",
+    "@id": {{ canonical | jsonLd | safe }},
+    "headline": {{ (title or meta.siteName) | jsonLd | safe }},
+    "description": {{ (discover.description or description or meta.siteDescription) | jsonLd | safe }},
+    "image": {{ image | jsonLd | safe }},
+    "inLanguage": {{ meta.locale | jsonLd | safe }},
     "publisher": {
-      "@type": "{{ meta.siteType }}",
-      "name": "{{ meta.author.name }}",
-      "url": "{{ meta.url }}"
+      "@type": {{ meta.siteType | jsonLd | safe }},
+      "name": {{ meta.author.name | jsonLd | safe }},
+      "url": {{ meta.url | jsonLd | safe }}
     },
     "author": {
       "@type": "Person",
-      "name": "{{ meta.author.name }}"
+      "name": {{ meta.author.name | jsonLd | safe }}
     },
-    "datePublished": "{{ date | toIsoString }}"
+    "datePublished": {{ date | toIsoString | jsonLd | safe }}
   }
 </script>

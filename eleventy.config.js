@@ -8,6 +8,7 @@
  */
 
 // register dotenv for process.env.* variables to pickup
+import {jsonLd} from './src/_config/filters/json-ld.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -87,6 +88,7 @@ export default async function (eleventyConfig) {
   eleventyConfig.addDataExtension('yaml', contents => yaml.load(contents));
 
   // --------------------- Filters
+  eleventyConfig.addFilter('jsonLd', jsonLd);
   eleventyConfig.addFilter('toIsoString', filters.toISOString);
   eleventyConfig.addFilter('formatDate', filters.formatDate);
   eleventyConfig.addFilter('markdownFormat', filters.markdownFormat);

@@ -1,0 +1,122 @@
+[
+  {
+    "name": "home",
+    "label": "desktop",
+    "version": "baseline",
+    "path": "home-desktop-baseline.png",
+    "width": 1440,
+    "height": 1000,
+    "status": 200,
+    "title": "Make the things you want to exist."
+  },
+  {
+    "name": "home",
+    "label": "desktop",
+    "version": "current",
+    "path": "home-desktop-current.png",
+    "width": 1440,
+    "height": 1000,
+    "status": 200,
+    "title": "Make the things you want to exist."
+  },
+  {
+    "name": "history",
+    "label": "desktop",
+    "version": "baseline",
+    "path": "history-desktop-baseline.png",
+    "width": 1440,
+    "height": 1000,
+    "status": 200,
+    "title": "A History of AI, From My Point of View"
+  },
+  {
+    "name": "history",
+    "label": "desktop",
+    "version": "current",
+    "path": "history-desktop-current.png",
+    "width": 1440,
+    "height": 1000,
+    "status": 200,
+    "title": "A History of AI, From My Point of View"
+  },
+  {
+    "name": "patterns",
+    "label": "desktop",
+    "version": "baseline",
+    "path": "patterns-desktop-baseline.png",
+    "width": 1440,
+    "height": 1000,
+    "status": 200,
+    "title": "AI Agent Patterns, as Mermaid Diagrams"
+  },
+  {
+    "name": "patterns",
+    "label": "desktop",
+    "version": "current",
+    "path": "patterns-desktop-current.png",
+    "width": 1440,
+    "height": 1000,
+    "status": 200,
+    "title": "AI Agent Patterns, as Mermaid Diagrams"
+  },
+  {
+    "name": "home",
+    "label": "mobile",
+    "version": "baseline",
+    "path": "home-mobile-baseline.png",
+    "width": 390,
+    "height": 844,
+    "status": 200,
+    "title": "Make the things you want to exist."
+  },
+  {
+    "name": "home",
+    "label": "mobile",
+    "version": "current",
+    "path": "home-mobile-current.png",
+    "width": 390,
+    "height": 844,
+    "status": 200,
+    "title": "Make the things you want to exist."
+  },
+  {
+    "name": "history",
+    "label": "mobile",
+    "version": "baseline",
+    "path": "history-mobile-baseline.png",
+    "width": 390,
+    "height": 844,
+    "status": 200,
+    "title": "A History of AI, From My Point of View"
+  },
+  {
+    "name": "history",
+    "label": "mobile",
+    "version": "current",
+    "path": "history-mobile-current.png",
+    "width": 390,
+    "height": 844,
+    "status": 200,
+    "title": "A History of AI, From My Point of View"
+  },
+  {
+    "name": "patterns",
+    "label": "mobile",
+    "version": "baseline",
+    "path": "patterns-mobile-baseline.png",
+    "width": 390,
+    "height": 844,
+    "status": 200,
+    "title": "AI Agent Patterns, as Mermaid Diagrams"
+  },
+  {
+    "name": "patterns",
+    "label": "mobile",
+    "version": "current",
+    "path": "patterns-mobile-current.png",
+    "width": 390,
+    "height": 844,
+    "status": 200,
+    "title": "AI Agent Patterns, as Mermaid Diagrams"
+  }
+]
