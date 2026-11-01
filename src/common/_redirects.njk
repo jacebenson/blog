@@ -1,14 +1,17 @@
 ---
 permalink: /_redirects
+layout: false
 eleventyExcludeFromCollections: true
 excludeFromSitemap: true
 ---
-{%- for page in collections.all -%}
-{%- if page.url and page.data.redirectFrom -%}
-{%- for oldUrl in page.data.redirectFrom -%}
+{% for page in collections.all %}
+{% if page.url and page.data.tags and 'posts' in page.data.tags and '/posts/drafts/' not in page.inputPath %}
+/post/{{ page.inputPath | legacyFileSlug }}/ {{ page.url }} 301
+/p/{{ page.inputPath | legacyFileSlug }}/ {{ page.url }} 301
+{% endif %}
+{% if page.url and page.data.redirectFrom %}
+{% for oldUrl in page.data.redirectFrom %}
 {{ oldUrl }} {{ page.url }} 301
 {% endfor %}
-{%- endif -%}
-{%- endfor -%}
-
-/p/* /blog/:splat 301
+{% endif %}
+{% endfor %}
