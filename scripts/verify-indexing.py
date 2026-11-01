@@ -19,6 +19,10 @@ sitemap = ET.parse(root / 'sitemap.xml').getroot()
 assert sitemap.tag == ns + 'urlset'
 urls = [node.text for node in sitemap.findall(ns + 'url/' + ns + 'loc')]
 assert urls and len(urls) == len(set(urls)), 'Duplicate sitemap URLs'
+# Paginated archives must advertise all generated pages, not only the first.
+for page in list((root / 'blog').glob('page-*/index.html')) + list((root / 'tags').glob('*/index.html')):
+    url = 'https://jace.pro/' + page.parent.relative_to(root).as_posix() + '/'
+    assert url in urls, f'Archive missing from sitemap: {url}'
 for url in urls:
     parsed = urlsplit(url)
     assert url.startswith('https://jace.pro/') and not parsed.query and not parsed.fragment, url

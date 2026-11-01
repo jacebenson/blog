@@ -28,6 +28,7 @@ jobs:
           done
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8088/post/2018-08-14-avoid-these-things/)" = 301
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8088/post/2019-11-25-comparing-code-searches/)" = 301
+          curl --silent --head -H 'X-Forwarded-Proto: https' 'http://localhost:8088/post/2018-08-14-avoid-these-things/?utm_source=test' | tr -d '\r' | grep -Fx 'Location: /blog/servicenow-features-i-avoid-and-you-should-too/?utm_source=test'
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8088/this-page-does-not-exist)" = 404
           curl --silent --head http://localhost:8088/sitemap.xml | grep -i 'Content-Type: application/xml'
       - name: Show Nginx diagnostics
