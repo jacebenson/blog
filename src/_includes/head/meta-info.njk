@@ -12,8 +12,8 @@
 <meta name="theme-color" content="{{ meta.themeDark }}" media="(prefers-color-scheme: dark)" />
 <meta name="theme-color" content="{{ meta.themeLight }}" media="(prefers-color-scheme: light)" />
 <!-- Search Engines -->
-<meta name="robots" content="index,follow" />
-<meta name="googlebot" content="index,follow" />
+<meta name="robots" content="{% if noindex %}noindex,follow{% else %}index,follow{% endif %}" />
+<meta name="googlebot" content="{% if noindex %}noindex,follow{% else %}index,follow{% endif %}" />
 <!-- Made with Eleventy! -->
 <meta name="generator" content="{{ eleventy.generator }}" />
 <!-- Disable automatic detection and formatting of possible phone numbers -->
