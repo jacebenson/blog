@@ -58,7 +58,12 @@ export const getAllPosts = collection => {
 
 /** All relevant pages as a collection for sitemap.xml */
 export const showInSitemap = collection => {
-  return collection.getFilteredByGlob('./src/**/*.{md,njk}');
+  return collection.getAll().filter(item =>
+    item.url && (item.url.endsWith('/') || item.url.endsWith('.html')) &&
+    !item.data.draft && !item.data.excludeFromSitemap && !item.data.noindex &&
+    !item.inputPath.includes('/posts/drafts/') && !item.inputPath.includes('/_includes/') && !item.inputPath.includes('/_layouts/') &&
+    item.url !== '/404.html' && !item.url.startsWith('/admin/')
+  );
 };
 
 /** All tags from all posts as a collection - excluding custom collections */

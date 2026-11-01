@@ -19,7 +19,7 @@
     "build:11ty": "cross-env ELEVENTY_ENV=production eleventy",
     "start": "npm run validate && npm run dev:11ty",
     "dev": "npm run validate && npm run dev:11ty",
-    "build": "npm run validate && npm run clean && npm run build:11ty",
+    "build": "npm run validate && npm run clean && npm run build:11ty && node scripts/nginx-redirects.mjs",
     "debug": "DEBUG=Eleventy* npx @11ty/eleventy"
   },
   "keywords": [],

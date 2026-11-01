@@ -5,6 +5,7 @@ date: '2018-08-15'
 tags:
   - servicenow
 redirectFrom:
+  - /post/2018-08-14-avoid-these-things/
   - /servicenow-features-i-avoid-and-you-should-too/
   - /p/2018-08-15-servicenow-features-i-avoid-and-you-should-too/
 ---

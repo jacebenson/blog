@@ -4,6 +4,7 @@ pagination:
   data: collections.tagList
   size: 1
   alias: tag
+  addAllPagesToCollections: true
 permalink: /tags/{{ tag | slugify }}/
 eleventyComputed:
   title: '{{ meta.blog.tagSingle }}: {{ tag }}'
