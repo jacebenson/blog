@@ -5,6 +5,7 @@ date: '2019-11-26'
 tags:
   - servicenow
 redirectFrom:
+  - /post/2019-11-25-comparing-code-searches/
   - /comparing-code-searchers/
   - /p/2019-11-25-comparing-code-searchers/ 
   - /2019-11-25-comparing-code-searchers/

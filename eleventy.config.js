@@ -29,6 +29,8 @@ export default async function (eleventyConfig) {
     await events.buildAllJs();
   });
 
+  eleventyConfig.addFilter('legacyFileSlug', inputPath => inputPath.split('/').pop().replace(/\.md$/, ''));
+
   // --------------------- custom wtach targets
   eleventyConfig.addWatchTarget('./src/assets/**/*.{css,js,svg,png,jpeg}');
   eleventyConfig.addWatchTarget('./src/_includes/**/*.{webc}');

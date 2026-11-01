@@ -2,6 +2,7 @@
 permalink: /sitemap.xml
 eleventyExcludeFromCollections: true
 excludeFromSitemap: true
+layout: false
 ---
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -15,7 +16,7 @@ excludeFromSitemap: true
       {% endif %}
 
       <url>
-        <loc>{{ meta.url }}{{ page.url }}</loc>
+        <loc>{{ (meta.url ~ page.url) | escape }}</loc>
         <lastmod>{{ lastmod | toIsoString }}</lastmod>
         <changefreq>{{ page.data.changeFreq if page.data.changeFreq else "monthly" }}</changefreq>
     </url>
