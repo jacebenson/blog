@@ -24,3 +24,6 @@ jobs:
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8088/post/2019-11-25-comparing-code-searches/)" = 301
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8088/this-page-does-not-exist)" = 404
           curl --silent --head http://localhost:8088/sitemap.xml | grep -i 'Content-Type: application/xml'
+      - name: Show Nginx diagnostics
+        if: failure()
+        run: docker logs indexing-nginx
