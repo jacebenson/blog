@@ -1,5 +1,4 @@
 import Image from '@11ty/eleventy-img';
-import path from 'node:path';
 
 const stringifyAttributes = attributeMap => {
   return Object.entries(attributeMap)
@@ -29,13 +28,8 @@ export const imageShortcode = async (
   const metadata = await Image(src, {
     widths: [...widths],
     formats: [...formats],
-    urlPath: '/assets/images/',
-    outputDir: './dist/assets/images/',
-    filenameFormat: (id, src, width, format, options) => {
-      const extension = path.extname(src);
-      const name = path.basename(src, extension);
-      return `${name}-${width}w.${format}`;
-    }
+    urlPath: '/img/',
+    outputDir: './dist/img/'
   });
 
   const lowsrc = metadata.jpeg[metadata.jpeg.length - 1];

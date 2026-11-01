@@ -8,7 +8,7 @@ RUN npm ci
 
 # Copy source and build
 COPY . .
-RUN npm run build
+RUN --mount=type=cache,id=jace-blog-images,target=/app/.cache,sharing=locked npm run build
 
 # Production stage - nginx
 FROM nginx:alpine

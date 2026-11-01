@@ -21,13 +21,16 @@ import filters from './src/_config/filters.js';
 import plugins from './src/_config/plugins.js';
 import shortcodes from './src/_config/shortcodes.js';
 import {markdownEquivalentsPlugin} from './src/_config/markdown-equivalents.js';
+import {restoreImageCache, saveImageCache} from './src/_config/image-cache.js';
 
 export default async function (eleventyConfig) {
   // --------------------- Events: before build
   eleventyConfig.on('eleventy.before', async () => {
+    await restoreImageCache();
     await events.buildAllCss();
     await events.buildAllJs();
   });
+  eleventyConfig.on('eleventy.after', saveImageCache);
 
   eleventyConfig.addFilter('legacyFileSlug', inputPath => inputPath.split('/').pop().replace(/\.md$/, ''));
 

@@ -3,6 +3,7 @@ node_modules
 .env
 .env-sample
 dist
+.cache
 src/_includes/css
 src/_includes/scripts
 src/assets/og-images
