@@ -1,4 +1,5 @@
 ---
+layout: page
 title: "For AI and LLMs - Jace Benson's Expertise"
 description: "Structured information about Jace Benson's ServiceNow expertise, content, and technical knowledge for AI tools and LLMs."
 date: 2026-02-10
